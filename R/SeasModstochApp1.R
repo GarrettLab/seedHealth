@@ -1,0 +1,352 @@
+
+#' Generate an interactive Shiny interface for one simulation
+#'
+#' This function simulates one parameter combination across nseasons once
+#'
+#' Updated 2018-08-23
+
+
+#' @inheritParams SeasModstoch
+#' @import shiny
+#' @importFrom  shiny shinyApp
+#' @import RColorBrewer
+#' @import KernSmooth
+#' @importFrom  magrittr %>%
+#' @importFrom  dplyr mutate
+#' @import ggplot2
+#' @importFrom utils write.csv
+#' @importFrom grDevices colorRampPalette
+#' @importFrom stats median quantile rnorm var
+#' @keywords seed health
+#' @examples
+#' SeasModstochApp1()
+#' @export
+#'
+#'
+
+
+# to do - GENERAL TESTING
+# to do - check whether parameter list is correct
+
+# Columns of output matrix
+# col 1 - season timestep (initial time step is season 0)
+# col 2 - HP healthy plant number
+# col 3 - DP diseased plant number (after roguing)
+# col 4 - HS healthy seed number
+# col 5 - DS diseased seed number
+# col 6 - pHS proportion healthy seed
+# col 7 - pDS proportion diseased seed
+# col 8 - mx vector management effect on transmission rate
+# col 9 - zx proportional selection against diseased plants
+# col 10 - ax roguing effect in terms of decreased DP
+# col 11 - wx environmental effect on transmission rate
+# col 12 - Yld end of season yield
+# col 13 - YL end of season yield loss
+# col 14 - DPbr (diseased plants before roguing)
+
+# Columns of output of outfin
+# col 15 - HPtrans Season in which HP first transitions below HPcut*Kx, if HPtrans is NA i.e., HP never less than HPcut, set to max seasons tested
+# col 16 - pHStrans Season in which pHS first transitions below pHScut, if pHStrans is NA i.e., pHS never less than pHScut, set to max seasons tested
+# col 17 - HPpseas Healthy plants are calculated from season 1 onwards
+# col 18 - pHPpseas Proportion seasons with pHS below pHScut
+
+# Step 1B. Create matrix for output from one simulation (stochastic model)
+
+# Weather (wx), vector management (mx), positive selection (zx) and roguing (zx) are stochastic
+# Each have a mean and associated standard deviation
+
+# set.seed(1234)
+
+# This function simulates nseasons for one parameter combination once
+
+
+#library(RColorBrewer)
+#library(KernSmooth)
+
+SeasModstochApp1 <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=0.3, hx=1, mxtnormm=1,
+                            mxtnormsd=0.1, axtnormm=1, axtnormsd=0.1, rx=0.1, zxtnormm=1, zxtnormsd= 0.1, gx=4,
+                            cx=0.9, phix=0, nseasons=10, HPcut=0.5, pHScut=0.5, maY=100, miY=0, thetax=0.2,  Ex=0) {
+  #require(shiny)
+  shiny::shinyApp(
+
+    # ui -------------------------------------------------
+    ui = fluidPage(
+      #--------------------------------------------------
+
+      #------------------------------------------------
+      headerPanel("Evaluating yield loss due to seed degeneration over time"),
+
+
+      #------------------------------------------------
+      sidebarPanel(width=4,
+
+                   #-------------------------------
+                   numericInput("group1Par1","Initial proportion of healthy seed (1=only healthy seed used, 0=only infected seed used)",min=0,max=1,value = 0.8, step = 0.1),
+                   numericInput("group1Par2","External inoculum around farm (50=high level of external inoculum, 0=absence of external inoculum)",min=0,max=50,value = 0, step = 5),
+                   numericInput("group1Par3","Maximum seasonal transmission rate (Maximum rate of disease transmission during the growing season when there are no limitations for disease to spread)",min=0.001,max=0.2,value = 0.02, step = 0.005),
+                   numericInput("group1Par4","Weather conduciveness for disease (1=highly disease conducive weather, 0=weather completely restricts disease spread)",min=0,max=1,value = 0.8, step = 0.1),
+                   #-------------------------------
+                   numericInput("group1Par5","Host susceptibility (1='completely' susceptible, 0=immune)",min=0,max=1,value = 1, step = 0.1),
+                   numericInput("group1Par6","Vector/weed management conducted (1= no management of vectors/weeds, 0=vector/weed eradication)",min=0,max=1,value = 1, step = 0.1),
+                   numericInput("group1Par7","Roguing conducted during season (1=no symptomatic plants removed, 0=all symptomatic plants removed)",min=0,max=1,value = 1, step = 0.1),
+
+
+                   numericInput("group1Par8","Seed production rate in healthy plants (Number of seed produced per healthy plant)",min=0,max=20,value = 4, step = 1),
+                   numericInput("group1Par9","Plant (seed) selection (1=random selection, 0=complete selection against diseased plants)",min=0,max=1,value = 1, step = 0.1),
+                   numericInput("group1Par10","Differential seed production (1=no difference in seed production between healthy and infected plants, 0=no seed production in diseased plants)",min=0,max=1,value = 0.9, step = 0.1),
+
+                   numericInput("group1Par11","Reversion in infected plants expressed as the proportion of disese-free seed produced by diseased plants (1=only healthy seed produced by an infected plant, 0=only infected seed produced by an infected plant)",min=0,
+                                max=1,value =0.1, step = 0.1),
+                   numericInput("group1Par12","Certified seed usage (1= only certified seed used, 0=no certified seed used)",min=0,max=1,value = 0, step = 0.1),
+                   numericInput("group1Par13","Rate of yield decline (0=constant rate of yield decline (straight line); for 0 to 0.5,yield declines slowly as disease incidence increases (concave); for -1 to 0, yield declines rapidly as disease incidence increases (convex)) ",min=-1,max=0.55,value = 0.2, step = 0.1),
+                   downloadButton("downloadParameter",label = "Download values of Parameters")
+
+      ),#sidebarPanel
+      #------------------------------------------------
+      #------------------------------------------------
+      #------------------------------------------------
+      #------------------------------------------------
+      #------------------------------------------------
+      #------------------------------------------------
+      mainPanel(column(width=12, height=700, class="well",
+
+
+                       h2("A risk assessment framework for seed degeneration: Informing an integrated seed
+                          health strategy for vegetatively-propagated crops"),
+                       h5("S. Thomas-Sharma, J. Andrade-Piedra, M. Carvajal Yepes, J. F. Hernandez Nopsa,
+                          M. J. Jeger, R. A. C. Jones, P. Kromann, J. P. Legg, J. Yuen, G. A. Forbes, and K. A. Garrett"),
+
+                       h5(" https://doi.org/10.1094/PHYTO-09-16-0340-R"),
+
+                       #img(src="UFandCo.png",height=80,width=1000),
+
+                       h3("This dashboard provides an estimate of yield loss due to seed degeneration, as a function of multiple environmental,
+                          biological, and management parameters that influence the development of seedborne diseases. It is a general model
+                          for vegetatively-propagated crops. Changing the values of the parameters on the left will result in
+                          a new estimate of yield loss over time")
+                       )
+                       ),
+      #------------------------------------------------
+      hr(),
+      hr(),
+      mainPanel(column(width=12, class="well",
+                       plotOutput("figure1",height=550,width = 1000),
+                       hr()
+      ))
+
+                       ),
+
+
+    # ---------------------------------------------------
+
+
+    # server --------------------------------------------
+
+    server = function(input, output) {
+
+
+
+
+      # for generating truncated normal random variables
+      altrtruncnorm <- function(n,a=0,b=1,meana=0,sda=1){
+        j <- rnorm(n,mean=meana,sd=sda)
+        j[j < a] <- a
+        j[j > b] <- b
+        j
+      }
+      # Weather (wx), vector management (mx), positive selection (zx) and roguing (zx) are stochastic
+      # Each have a mean and associated standard deviation
+
+      set.seed(1234)
+
+      #&&&&&&&&&&&&&&&&&&&&&&&&
+      # This function simulates nseasons for one parameter combination once
+      SeasModstoch <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=0.3,
+                               hx=1, mxtnormm=1, mxtnormsd=0.1, axtnormm=1, axtnormsd=0.1, rx=0.1,
+                               zxtnormm=1, zxtnormsd= 0.1, gx=4, cx=0.9, phix=0, nseasons=10,
+                               HPcut=0.5, pHScut=0.5, maY=100, miY=0, thetax=0.2,  Ex=0) {
+
+        outm <- as.data.frame(matrix(data=-999, nrow=(nseasons+1), ncol=14,
+                                     dimnames = list(1:(nseasons+1),
+                                                     c('season','HP', 'DP','HS','DS','pHS','pDS','mx','zx','ax','wx', 'Yld','YL','DPbr')))
+        )
+
+        outm[1,] <- NA # row one gives initial conditions
+        outm$season <- 0:nseasons
+
+        # Initial value for state variables
+        outm$pHS[1] <- pHSinit # initial proportion healthy seed (for nseasons=0)
+        outm$pDS[1] <- 1 - pHSinit
+
+        # seasons 2 and higher
+
+        for(si in 2:(nseasons+1)) {
+          #Generating stochastic  varaibles
+          outm$wx[si] <-ifelse(wxtnormsd==0, wxtnormm, (altrtruncnorm(1,a=0,b=1,mean=wxtnormm,sd=wxtnormsd)))
+          outm$mx[si] <- ifelse(mxtnormsd==0, mxtnormm, (altrtruncnorm(1,a=0,b=1,mean=mxtnormm,sd=mxtnormsd)))
+          outm$ax[si] <- ifelse(axtnormsd==0, axtnormm, (altrtruncnorm(1,a=0,b=1,mean=axtnormm,sd=axtnormsd)))
+          outm$zx[si] <-ifelse(zxtnormsd==0, zxtnormm, (altrtruncnorm(1,a=0,b=1,mean=zxtnormm,sd=zxtnormsd)))
+          #Calculating rate of disease transmission
+          tempnewinf<-  betax * outm$wx[si] * hx * outm$mx[si] * ((Kx * outm$pDS[si-1]) * (Kx * outm$pHS[si-1])+ Ex*(Kx * outm$pHS[si-1]))
+          #Equation A1
+          outm$HP[si] <- min(max(0,Kx * outm$pHS[si-1] - tempnewinf),100)
+          # Equation A2
+          outm$DPbr[si] <- min(max(0, Kx * outm$pDS[si-1] + tempnewinf),100)
+          # Equation A3
+          # Equation A3
+          outm$DP[si] <- outm$ax[si]*outm$DPbr[si]
+          # Equation B1
+          outm$HS[si] <- max(0,gx * (outm$HP[si] + rx * outm$DP[si]))
+          # Equation B2
+          outm$DS[si] <- max(0,outm$zx[si] * cx * gx * (1 - rx) * outm$DP[si])
+          #Equation C1
+          outm$Yld[si]<- ((outm$HP[si]+outm$DP[si])/(outm$HP[si]+outm$DPbr[si]))*(miY+(maY-miY)*((1-(outm$DP[si]/(outm$DP[si]+outm$HP[si])))/((1-thetax)+ thetax*(1-(outm$DP[si]/(outm$DP[si]+outm$HP[si]))))^2))
+          # Equation C2
+          outm$YL[si]<- maY-outm$Yld[si]
+          # Equation D1
+          outm$pHS[si] <- phix + (1-phix) * outm$HS[si]/(outm$HS[si] + outm$DS[si])
+          # Equation D2
+          outm$pDS[si] <- 1 - outm$pHS[si]
+        }
+
+        outfin <- outm[(nseasons+1),]
+
+        # Season in which HP first transitions below HPcut*Kx
+        HPtrans <- outm$season[which(outm$HP < HPcut*Kx)][1]
+        # if HPtrans is NA i.e., HP never less than HPcut, set to max seasons tested
+        HPtrans[is.na(HPtrans)]<-nseasons
+        # Season in which pHS first transitions below pHScut
+        pHStrans <- outm$season[which(outm$pHS < pHScut)][1]
+        # if pHStrans is NA i.e., pHS never less than pHScut, set to max seasons tested
+        pHStrans[is.na(pHStrans)]<-nseasons
+        # Proportion seasons with HP below HPcut*Kx
+        # Healthy plants are calculated from season 1 onwards so +1 not needed in denominator
+        HPpseas <- length(outm$season[which(outm$HP < HPcut*Kx)])/nseasons
+        # Proportion seasons with pHS below pHScut
+        # if +1 is not included in denominator, if in season 0 pHS<pHScut, the proportion is >1
+        pHSpseas <- length(outm$season[2:nseasons][which(outm$pHS < pHScut)])/(nseasons+1)
+
+        # ptempa <- matrix(c(HPtrans,pHStrans,HPpseas,pHSpseas),
+        #                  dimnames=list(c('HPtrans','pHStrans','HPpseas','pHSpseas'),'1'))
+        # ptempb <- as.data.frame(t(ptempa))
+
+        ptemp <- as.data.frame(t(matrix(c(HPtrans,pHStrans,HPpseas,pHSpseas),
+                                        dimnames=list(c('HPtrans','pHStrans','HPpseas','pHSpseas'),'1'))))
+
+        outfin <- cbind(outfin,ptemp)
+
+        list(outm=outm,outfin=outfin)
+      }
+      #&&&&&&&&&&&&&&&&&&&&&&&&
+
+      #************************************************************
+      #############################################################
+      Data<-reactive({
+        #registration input variables
+        Initial_Proportion_of_Healthy_Seed<-input$group1Par1
+        External_Inoculum_around_Farm<-input$group1Par2
+        Max_Seasonal_Transmission_Rate<-input$group1Par3
+        Weather_Conduciveness_for_Disease<-input$group1Par4
+        Host_Susceptibility<-input$group1Par5
+        Vector_Weed_Management_Conducted<-input$group1Par6
+        Roguing_Conducted_During_Season<-input$group1Par7
+        Seed_Production_Rate_in_Healthy_Plants<-input$group1Par8
+        Plant_Seed_Selection<-input$group1Par9
+        Differential_Seed_Production<-input$group1Par10
+        Reversion_in_Infected_Plants<-input$group1Par11
+        Certified_Seed_Usage<-input$group1Par12
+        Rate_of_Yield_Decline<-input$group1Par13
+
+        df<-as.data.frame(cbind(
+          Initial_Proportion_of_Healthy_Seed<-input$group1Par1,
+          External_Inoculum_around_Farm<-input$group1Par2,
+          Max_Seasonal_Transmission_Rate<-input$group1Par3,
+          Weather_Conduciveness_for_Disease<-input$group1Par4,
+          Host_Susceptibility<-input$group1Par5,
+          Vector_Weed_Management_Conducted<-input$group1Par6,
+          Roguing_Conducted_During_Season<-input$group1Par7,
+          Seed_Production_Rate_in_Healthy_Plants<-input$group1Par8,
+          Plant_Seed_Selection<-input$group1Par9,
+          Differential_Seed_Production<-input$group1Par10,
+          Reversion_in_Infected_Plants<-input$group1Par11,
+          Certified_Seed_Usage<-input$group1Par12,
+          Rate_of_Yield_Decline<-input$group1Par13
+        ))
+
+        return(list(SeedDegenerationData=df))
+
+      })# reactive data frame end
+
+      #Creates the final data frame
+
+      output$table<-renderTable({
+        if(is.null(Data())){return()}
+        #print(Data()$df)
+      })
+      #The download button
+      output$downloadParameter <- downloadHandler(filename = "SDData.csv",
+                                                  content = function(file) {
+                                                    write.csv(Data(), file, row.names=TRUE)
+
+                                                  }
+      )
+
+
+
+      #############################################################
+
+      output$figure1<-renderPlot({
+
+        out1 <- SeasModstoch(pHSinit=input$group1Par1, Kx = 100, Ex=input$group1Par2,betax=input$group1Par3, wxtnormm=input$group1Par4,
+                             hx=input$group1Par5,mxtnormm=input$group1Par6,axtnormm=input$group1Par7,gx=input$group1Par8,zxtnormm=input$group1Par9,
+                             cx=input$group1Par10,rx=input$group1Par11,phix=input$group1Par12,thetax=input$group1Par13,
+                             wxtnormsd= 0.1,mxtnormsd=0.1,axtnormsd=0.1,zxtnormsd= 0.1,nseasons=10,HPcut=0.5, pHScut=0.5, maY=100,miY=0 )
+
+
+        Yield_Loss <- out1$outm$YL[-1]
+        Season <- out1$outm$season[-1]
+        for(i in 1:100){ # higher values make a smoother plot
+          out1<- SeasModstoch(pHSinit=input$group1Par1, Kx = 100, Ex=input$group1Par2,betax=input$group1Par3, wxtnormm=input$group1Par4,
+                              hx=input$group1Par5,mxtnormm=input$group1Par6,axtnormm=input$group1Par7,gx=input$group1Par8,zxtnormm=input$group1Par9,
+                              cx=input$group1Par10,rx=input$group1Par11,phix=input$group1Par12,thetax=input$group1Par13,
+                              wxtnormsd= 0.1,mxtnormsd=0.1,axtnormsd=0.1,zxtnormsd= 0.1,nseasons=10,HPcut=0.5, pHScut=0.5, maY=100,miY=0 )
+          Yield_Loss <- c(Yield_Loss,out1$outm$YL[-1])
+          Season <- c(Season,out1$outm$season[-1])
+        }
+#----------
+        data <- as.data.frame(cbind(Yield_Loss,Season))
+        data=data %>%
+          mutate(SimulateCol = rep(1:(nrow(data)/10), each=10))
+
+        ggplot(data, aes(Season, Yield_Loss))+
+          geom_point(alpha=0.1, color="dodgerblue")+
+          geom_line(aes(group = data$SimulateCol), color="dodgerblue", alpha=0.1) +
+          stat_summary()+
+          stat_summary(geom="line")+
+          theme_classic()+
+          scale_x_continuous(breaks=1:10)+
+          xlab('Season')+
+          ylab('Yield Loss (%)')+
+          theme(axis.title = element_text(face = "bold",
+                                          size = 20),
+                axis.text = element_text(size = 16),
+                legend.background = element_blank(),
+                legend.box.background = element_blank(),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank(),
+                panel.background = element_rect(fill = "transparent",colour = NA),
+                plot.background = element_rect(fill = "transparent",colour = NA)
+          )
+        #---------------------------------------------
+      })
+
+
+    }
+
+
+    # ---------------------------------------------------
+
+      )
+
+}
+
