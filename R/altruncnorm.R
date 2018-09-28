@@ -26,7 +26,7 @@ altruncnorm <- function(n = 100, a = 0, b = 1, mean = 0, sd = 1){
   j[j > b] <- b
 
   #---------------------------------------
-  #Warning messages
+  #Warning messages - to be updated
   if (n <= 0 | floor(n) != n) {
     warning (paste('n must be a positive integer, your input is', n))
   } else if (a < 0 | a > 1) {
