@@ -41,14 +41,21 @@
 # set.seed(1234)
 
 
-multisim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=0.3, hx=1, mxtnormm=1, mxtnormsd=0.1, axtnormm=1, axtnormsd=0.1, rx=0.1, zxtnormm=1, zxtnormsd= 0.1, gx=4, cx=0.9, phix=0, nseasons=10, nsim=10, HPcut=0.5,pHScut=0.5,maY=100, miY=0, thetax=0.2, Ex=0) {
+multisim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=0.3, hx=1, mxtnormm=1, 
+                     mxtnormsd=0.1, axtnormm=1, axtnormsd=0.1, rx=0.1, zxtnormm=1, zxtnormsd= 0.1, gx=4, 
+                     cx=0.9, phix=0, nseasons=10, nsim=10, HPcut=0.5,pHScut=0.5,maY=100, miY=0, thetax=0.2, Ex=0) {
 
   # nsim - number of simulations
 
-  outmf <- as.data.frame(matrix(data=-999, nrow=nsim, ncol=12, dimnames = list(1:nsim,c('fHP', 'fDP', 'fHS', 'fDS', 'fpHS', 'fpDS', 'HPtrans', 'pHStrans', 'HPpseas', 'pHSpseas', 'fYld', 'fYL'))))
+  outmf <- as.data.frame(matrix(data=-999, nrow=nsim, ncol=12, 
+                                dimnames = list(1:nsim,c('fHP', 'fDP', 'fHS', 'fDS', 'fpHS', 'fpDS', 'HPtrans', 'pHStrans', 'HPpseas', 'pHSpseas', 'fYld', 'fYL'))))
 
   for(si in 1:nsim) {
-    temp <- onesim(pHSinit=pHSinit, Kx = Kx, betax=betax, wxtnormm=wxtnormm, wxtnormsd=wxtnormsd, hx=hx, mxtnormm=mxtnormm, mxtnormsd=mxtnormsd, axtnormm=axtnormm, axtnormsd=axtnormsd, rx=rx,zxtnormm=zxtnormm, zxtnormsd= zxtnormsd, gx=gx, cx=cx, phix=phix, nseasons=nseasons, HPcut=HPcut, pHScut=pHScut, maY=maY, miY=miY, thetax=thetax, Ex=Ex)$outfin
+    temp <- onesim(pHSinit=pHSinit, Kx = Kx, betax=betax, wxtnormm=wxtnormm, wxtnormsd=wxtnormsd, 
+                   hx=hx, mxtnormm=mxtnormm, mxtnormsd=mxtnormsd, axtnormm=axtnormm, axtnormsd=axtnormsd, 
+                   rx=rx,zxtnormm=zxtnormm, zxtnormsd= zxtnormsd, gx=gx, cx=cx, phix=phix, nseasons=nseasons, 
+                   HPcut=HPcut, pHScut=pHScut, maY=maY, miY=miY, thetax=thetax, Ex=Ex)$outfin
+    
     outmf$fHP[si] <- temp$HP
     outmf$fDP[si] <- temp$DP
     outmf$fHS[si] <- temp$HS
@@ -66,7 +73,8 @@ multisim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=
   quantile0.05 <- function(x){quantile(x,probs=0.05,na.rm=T)}
   quantile0.95 <- function(x){quantile(x,probs=0.95,na.rm=T)}
 
-  outfsum <- as.data.frame(matrix(data=-999, nrow=5, ncol=12, dimnames = list(c('mean','median','var','q0.05','q0.95'), c('fHP', 'fDP', 'fHS', 'fDS', 'fpHS', 'fpDS',  'HPtrans', 'pHStrans', 'HPpseas', 'pHSpseas', 'fYld', 'fYL'))))
+  outfsum <- as.data.frame(matrix(data=-999, nrow=5, ncol=12, 
+                                  dimnames = list(c('mean','median','var','q0.05','q0.95'), c('fHP', 'fDP', 'fHS', 'fDS', 'fpHS', 'fpDS',  'HPtrans', 'pHStrans', 'HPpseas', 'pHSpseas', 'fYld', 'fYL'))))
 
   # the first row gives the mean for each of the responses, the second the median, etc.
   outfsum[1,] <- apply(outmf,MARGIN=2,FUN=mean)
@@ -79,8 +87,8 @@ multisim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=
   # warning message
   if ( pHSinit < 0 | pHSinit > 1){
     warning(paste('pHSinit: your input value is', pHSinit,', it must be between 0 and 1'))
-  } else if (betax < 0.001 | betax > 0.2) {
-    warning(paste('betax: your input value is', betax,', it must be between 0.001 and 0.2'))
+  } else if (betax < 0.001 ) {
+    warning(paste('betax: your input value is', betax,', it must be greater than or equal to 0.001'))
   } else if (wxtnormm < 0 | wxtnormm > 1) {
     warning(paste('wxtnormm: your input value is', wxtnormm,', it must be between 0 and 1'))
   } else if (hx < 0 | hx > 1) {
@@ -93,16 +101,16 @@ multisim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=
     warning(paste('rx: your input value is', rx,', it must be between 0 and 1'))
   } else if (zxtnormm < 0 | zxtnormm > 1) {
     warning(paste('zxtnormm: your input value is', zxtnormm,', it must be between 0 and 1'))
-  } else if (gx < 0 | gx > 20) {
-    warning(paste('gx: your input value is', gx,', it must be between 0 and 20'))
+  } else if (gx < 0 ) {
+    warning(paste('gx: your input value is', gx,', it must be 0 or a positive integer'))
   } else if (cx < 0 | cx > 1) {
     warning(paste('cx: your input value is', cx,', it must be between 0 and 1'))
   } else if (phix < 0 | phix > 1) {
     warning(paste('phix: your input value is', phix,', it must be between 0 and 1'))
-  } else if (thetax < -1 | thetax > 0.55) {
-    warning(paste('thetax: your input value is', thetax,', it must be between -1 and 0.55'))
-  } else if (Ex < 0 | Ex > 50) {
-    warning(paste('Ex: your input value is', Ex,', it must be between 0 and 50'))
+  } else if (thetax < -1 | thetax > 1) {
+    warning(paste('thetax: your input value is', thetax,', it must be between -1 and 1'))
+  } else if (Ex < 0 ) {
+    warning(paste('Ex: your input value is', Ex,', it must be greater than or equal to 0'))
   }else {
 
     list(outmf=outmf,outfsum=outfsum)
