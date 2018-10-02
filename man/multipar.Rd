@@ -5,12 +5,12 @@
 \title{Create a matrix with output for multiple parameter combinations}
 \usage{
 multipar(pHSinit = c(0.2, 0.5, 0.8), Kx = 100, betax = c(0.02, 0.04),
-  wxtnormm = c(0.3, 0.7), wxtnormsd = c(0.3, 0.1), hx = 1,
-  mxtnormm = 1, mxtnormsd = 0.1, axtnormm = c(1, 0.5),
-  axtnormsd = c(0.3, 0.1), rx = c(0.1, 0.3), zxtnormm = c(1, 0.5),
-  zxtnormsd = c(0.3, 0.1), gx = 4, cx = 0.9, phix = c(0, 0.5),
-  nseasons = 10, nsim = 1, HPcut = 0.5, pHScut = 0.5, maY = 100,
-  miY = 0, thetax = c(-0.5, 0, 0.5), Ex = 0.02)
+  wxtnormm = c(0.3, 0.7), wxtnormsd = c(0.3, 0.1), hx = 1, mxtnormm = 1,
+  mxtnormsd = 0.1, axtnormm = c(1, 0.5), axtnormsd = c(0.3, 0.1),
+  rx = c(0.1, 0.3), zxtnormm = c(1, 0.5), zxtnormsd = c(0.3, 0.1),
+  gx = 4, cx = 0.9, phix = c(0, 0.5), nseasons = 10, nsim = 1,
+  HPcut = 0.5, pHScut = 0.5, maY = 100, miY = 0, thetax = c(-0.5, 0,
+  0.5), Ex = 0.02)
 }
 \arguments{
 \item{pHSinit}{the initial proportion of healthy seed, numeric or numeric vector.}

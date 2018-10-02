@@ -4,12 +4,12 @@
 \alias{multipar_plot}
 \title{Plots of output for multiple parameter combinations}
 \usage{
-multipar_plot(pHSinit = 0.2, Kx = 100, betax = 0.02,
-  wxtnormm = seq(0, 1, 0.2), wxtnormsd = 0.3, hx = 1, mxtnormm = 1,
-  mxtnormsd = 0, axtnormm = 1, axtnormsd = 0, rx = 0.1,
-  zxtnormm = seq(0, 1, 0.2), zxtnormsd = 0.3, gx = 4, cx = 0.9,
-  phix = 0, nseasons = 10, nsim = 100, HPcut = 0.5, pHScut = 0.5,
-  maY = 100, miY = 0, thetax = 0.2, Ex = 0)
+multipar_plot(pHSinit = 0.2, Kx = 100, betax = 0.02, wxtnormm = seq(0,
+  1, 0.2), wxtnormsd = 0.3, hx = 1, mxtnormm = 1, mxtnormsd = 0,
+  axtnormm = 1, axtnormsd = 0, rx = 0.1, zxtnormm = seq(0, 1, 0.2),
+  zxtnormsd = 0.3, gx = 4, cx = 0.9, phix = 0, nseasons = 10,
+  nsim = 100, HPcut = 0.5, pHScut = 0.5, maY = 100, miY = 0,
+  thetax = 0.2, Ex = 0)
 }
 \arguments{
 \item{pHSinit}{the initial proportion of healthy seed, numeric or numeric vector.}
