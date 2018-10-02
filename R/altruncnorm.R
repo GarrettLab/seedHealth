@@ -14,7 +14,7 @@
 #' @importFrom stats median quantile rnorm var
 #' @export
 #' @examples
-#' altruncnorm() # to be added
+#' altruncnorm() # more examples to be added
 
 
 

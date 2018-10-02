@@ -24,6 +24,6 @@ Note that this function is different from the one in the package truncnorm.
 Updated 2018-09-28
 }
 \examples{
-altruncnorm() # to be added
+altruncnorm() # more examples to be added
 }
 \keyword{misc}
