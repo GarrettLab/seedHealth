@@ -38,21 +38,26 @@
 
 # set.seed(1234)
 
-multipar <- function(pHSinit=c(0.2,0.5,0.8), Kx = 100, betax=c(0.02,0.04), wxtnormm=c(0.3,0.7),            wxtnormsd=c(0.3, 0.1), hx=1, mxtnormm=1, mxtnormsd=0.1, axtnormm=c(1,0.5), axtnormsd= c(0.3, 0.1), rx=c(0.1,0.3), zxtnormm=c(1,0.5), zxtnormsd= c(0.3, 0.1), gx=4, cx=0.9, phix=c(0,0.5), nseasons=10, nsim=1, HPcut=0.5, pHScut=0.5,                 maY=100, miY=0, thetax=c(-0.5,0,0.5), Ex=0.02){
+multipar <- function(pHSinit=c(0.2,0.5,0.8), Kx = 100, betax=c(0.02,0.04), wxtnormm=c(0.3,0.7),
+                     wxtnormsd=c(0.3, 0.1), hx=1, mxtnormm=1, mxtnormsd=0.1, axtnormm=c(1,0.5),
+                     axtnormsd= c(0.3, 0.1), rx=c(0.1,0.3), zxtnormm=c(1,0.5), zxtnormsd= c(0.3, 0.1),
+                     gx=4, cx=0.9, phix=c(0,0.5), nseasons=10, nsim=1, HPcut=0.5, pHScut=0.5,
+                     maY=100, miY=0, thetax=c(-0.5,0,0.5), Ex=0.02){
 
   if( any(pHSinit < 0 | pHSinit > 1)) stop(paste('pHSinit: your input value is', pHSinit,', it must be between 0 and 1'))
-  if( sum(betax < 0.001) > 0 | sum(betax > 0.2) > 0) stop(paste('betax: your input value is', betax,', it must be between 0.001 and 0.2'))
+  if( sum(betax < 0.001) > 0 ) stop(paste('betax: your input value is', betax,', it must be greater than or equal to 0.001'))
   if( any(hx < 0 | hx > 1) ) stop('hx is not between 0 and 1')
+  if( any(wxtnormm < 0) | any(wxtnormm > 1)) stop(paste('wxtnormm: your input value is', wxtnormm,', it must be between 0 and 1'))
   if( any(mxtnormm < 0) | any(mxtnormm > 1)) stop(paste('mxtnormm: your input value is', mxtnormm,', it must be between 0 and 1'))
   if( any(axtnormm < 0) | any(axtnormm > 1)) stop(paste('axtnormm: your input value is', axtnormm,', it must be between 0 and 1'))
 #  if( any(axtnormsd < 0) | any(axtnormm > 0.29)) stop(paste('axtnormsd: your input value is', axtnormsd,', it must be between 0 and 0.29'))
   if( any(rx < 0)  | any(rx > 1)) stop(paste('rx: your input value is', rx,', it must be between 0 and 1'))
   if (any(zxtnormm < 0) | any(zxtnormm > 1)) stop(paste('zxtnormm: your input value is', zxtnormm,', it must be between 0 and 1'))
-  if (any(gx < 0) | any(gx > 20)) stop(paste('gx: your input value is', gx,', it must be between 0 and 20'))
+  if (any(gx < 0) ) stop(paste('gx: your input value is', gx,', it must be 0 or a positive integer'))
   if (any(cx < 0) | any(cx > 1)) stop(paste('cx: your input value is', cx,', it must be between 0 and 1'))
   if (any(phix < 0) | any(phix > 1)) stop(paste('phix: your input value is', phix,', it must be between 0 and 1'))
-  if (any(thetax < -1) | any(thetax > 0.55)) stop(paste('thetax: your input value is', thetax,', it must be between -1 and 0.55'))
-  if (any(Ex < 0) > 0 | any(Ex > 50) > 0) stop(paste('Ex: your input value is', Ex,', it must be between 0 and 50'))
+  if (any(thetax < -1) | any(thetax > 1)) stop(paste('thetax: your input value is', thetax,', it must be between -1 and 1'))
+  if (sum(Ex < 0) > 0)  stop(paste('Ex: your input value is', Ex,', it must be greater than or equal to 0'))
 
 
 ncomb <- length(pHSinit) * length(Kx) * length(betax) * length(wxtnormm) * length(wxtnormsd)*length(hx) * length(mxtnormm)*length(mxtnormsd) * length(axtnormm) * length(axtnormsd) * length(rx) * length(zxtnormm) * length(zxtnormsd) * length(gx) * length(cx) * length(phix) * length(nseasons) * length(nsim) * length(HPcut) * length(pHScut) * length(maY)*length(miY)*length(thetax)*length(Ex)
@@ -89,7 +94,9 @@ for(i23 in 1:length(thetax)){tthetax<- thetax[i23]
 for(i24 in 1:length(Ex)){tEx<-Ex[i24]
 
 
-temp <- multisim(tpHSinit, tKx, tbetax, twxtnormm, twxtnormsd, thx, tmxtnormm, tmxtnormsd, taxtnormm, taxtnormsd, trx, tzxtnormm, tzxtnormsd, tgx, tcx, tphix, tnseasons, tnsim, tHPcut, tpHScut, tmaY, tmiY,  tthetax,  tEx)$outfsum
+temp <- multisim(tpHSinit, tKx, tbetax, twxtnormm, twxtnormsd, thx, tmxtnormm, tmxtnormsd, taxtnormm, taxtnormsd,
+                 trx, tzxtnormm, tzxtnormsd, tgx, tcx, tphix, tnseasons, tnsim, tHPcut, tpHScut, tmaY, tmiY,  tthetax,
+                 tEx)$outfsum
 
 outmpc[icomb,1:24] <- c(tpHSinit,tKx,tbetax,twxtnormm,twxtnormsd,thx,tmxtnormm, tmxtnormsd,taxtnormm,taxtnormsd,trx,tzxtnormm,tzxtnormsd,tgx,tcx, tphix,tnseasons,tnsim,tHPcut,tpHScut,tmaY,tmiY,tthetax, tEx)
 outmpc[icomb,25:36] <- temp[1,]
@@ -106,8 +113,8 @@ icomb <- icomb + 1
 
 if ( sum(pHSinit < 0) > 0 | sum( pHSinit > 1) > 0 ){
   warning(paste('pHSinit: your input value is', pHSinit,', it must be between 0 and 1'))
-} else if (sum(betax < 0.001) > 0 | sum(betax > 0.2) > 0) {
-  warning(paste('betax: your input value is', betax,', it must be between 0.001 and 0.2'))
+} else if (sum(betax < 0.001) > 0) {
+  warning(paste('betax: your input value is', betax,', it must be greater than or equal to 0.001'))
 } else if (sum(wxtnormm < 0) > 0 | sum(wxtnormm > 1) > 0) {
   warning(paste('wxtnormm: your input value is', wxtnormm,', it must be between 0 and 1'))
 } else if (sum(hx < 0) > 0 | sum(hx > 1) > 0) {
@@ -120,16 +127,16 @@ if ( sum(pHSinit < 0) > 0 | sum( pHSinit > 1) > 0 ){
   warning(paste('rx: your input value is', rx,', it must be between 0 and 1'))
 } else if (sum(zxtnormm < 0) > 0 | sum(zxtnormm > 1) > 0 ) {
   warning(paste('zxtnormm: your input value is', zxtnormm,', it must be between 0 and 1'))
-} else if (sum(gx < 0) > 0 | sum(gx > 20) > 0) {
-  warning(paste('gx: your input value is', gx,', it must be between 0 and 20'))
+} else if (sum(gx < 0) > 0) {
+  warning(paste('gx: your input value is', gx,', it must be 0 or a positive integer'))
 } else if (sum(cx < 0) > 0 | sum(cx > 1) > 0 ) {
   warning(paste('cx: your input value is', cx,', it must be between 0 and 1'))
 } else if (sum(phix < 0) > 0 | sum(phix > 1) > 0 ) {
   warning(paste('phix: your input value is', phix,', it must be between 0 and 1'))
-} else if (sum(thetax < -1) > 0 | sum(thetax > 0.55) > 0 ) {
-  warning(paste('thetax: your input value is', thetax,', it must be between -1 and 0.55'))
-} else if (sum(Ex < 0) > 0 | sum(Ex > 50) > 0) {
-  warning(paste('Ex: your input value is', Ex,', it must be between 0 and 50'))
+} else if (sum(thetax < -1) > 0 | sum(thetax > 1) > 0 ) {
+  warning(paste('thetax: your input value is', thetax,', it must be between -1 and 1'))
+} else if (sum(Ex < 0) > 0 ) {
+  warning(paste('Ex: your input value is', Ex,', it must be greater than or equal to 0'))
 }else {
   return(as.tibble(outmpc))
 }
