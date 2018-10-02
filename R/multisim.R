@@ -13,11 +13,10 @@
 #' @importFrom stats median quantile rnorm var
 #' @export
 #' @examples
-#' multisim() # to be added
+#' multisim() # more examples to be added
 
 
-# to do - GENERAL TESTING
-# to do - check whether parameter list is correct
+# to do - GT
 
 # Columns of output matrix
 # col 1 - fHP healthy plant number
@@ -32,13 +31,8 @@
 # col 10 - pHSpseas Proportion seasons with pHS below pHScut
 # col 11 - fYld end of season yield
 # col 12 - fYL end of season yield loss
-# col 13 - DPbr diseased plants before roguing
 
 # Step 1B. Create matrix for output from one simulation (stochastic model)
-
-
-
-# set.seed(1234)
 
 
 multisim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=0.3, hx=1, mxtnormm=1, 

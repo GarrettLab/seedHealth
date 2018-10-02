@@ -34,12 +34,11 @@
 #' @importFrom stats median quantile rnorm var
 #' @export
 #' @examples
-#' onesim() # to be added
+#' onesim() # more examples to be added
 
 
 
-# to do - GENERAL TESTING
-# to do - check whether parameter list is correct
+# to do - GT
 
 # Columns of output matrix
 # col 1 - season timestep (initial time step is season 0)
@@ -60,15 +59,13 @@
 # Columns of output of outfin
 # col 15 - HPtrans Season in which HP first transitions below HPcut*Kx, if HPtrans is NA i.e., HP never less than HPcut, set to max seasons tested
 # col 16 - pHStrans Season in which pHS first transitions below pHScut, if pHStrans is NA i.e., pHS never less than pHScut, set to max seasons tested
-# col 17 - HPpseas Healthy plants are calculated from season 1 onwards8************
+# col 17 - HPpseas Healthy plants are calculated from season 1 onwards
 # col 18 - pHSpseas Proportion seasons with pHS below pHScut
 
 # Step 1B. Create matrix for output from one simulation (stochastic model)
 
 # Weather (wx), vector management (mx), positive selection (zx) and roguing (zx) are stochastic
 # Each have a mean and associated standard deviation
-
-# set.seed(1234)
 
 # This function simulates nseasons for one parameter combination once
 
@@ -101,7 +98,6 @@ onesim <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnormsd=0.
     outm$HP[si] <- min(max(0,Kx * outm$pHS[si-1] - tempnewinf),100)
     # Equation A2
     outm$DPbr[si] <- min(max(0, Kx * outm$pDS[si-1] + tempnewinf),100)
-    # Equation A3
     # Equation A3
     outm$DP[si] <- outm$ax[si]*outm$DPbr[si]
     # Equation B1

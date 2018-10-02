@@ -26,40 +26,7 @@
 #'
 
 
-# to do - GENERAL TESTING
-# to do - check whether parameter list is correct
-
-# Columns of output matrix
-# col 1 - season timestep (initial time step is season 0)
-# col 2 - HP healthy plant number
-# col 3 - DP diseased plant number (after roguing)
-# col 4 - HS healthy seed number
-# col 5 - DS diseased seed number
-# col 6 - pHS proportion healthy seed
-# col 7 - pDS proportion diseased seed
-# col 8 - mx vector management effect on transmission rate
-# col 9 - zx proportional selection against diseased plants
-# col 10 - ax roguing effect in terms of decreased DP
-# col 11 - wx environmental effect on transmission rate
-# col 12 - Yld end of season yield
-# col 13 - YL end of season yield loss
-# col 14 - DPbr (diseased plants before roguing)
-
-# Columns of output of outfin
-# col 15 - HPtrans Season in which HP first transitions below HPcut*Kx, if HPtrans is NA i.e., HP never less than HPcut, set to max seasons tested
-# col 16 - pHStrans Season in which pHS first transitions below pHScut, if pHStrans is NA i.e., pHS never less than pHScut, set to max seasons tested
-# col 17 - HPpseas Healthy plants are calculated from season 1 onwards
-# col 18 - pHPpseas Proportion seasons with pHS below pHScut
-
-# Step 1B. Create matrix for output from one simulation (stochastic model)
-
-# Weather (wx), vector management (mx), positive selection (zx) and roguing (zx) are stochastic
-# Each have a mean and associated standard deviation
-
-# set.seed(1234)
-
-# This function simulates nseasons for one parameter combination once
-
+# to do - GT
 
 #library(RColorBrewer)
 #library(KernSmooth)

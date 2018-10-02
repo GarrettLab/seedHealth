@@ -11,15 +11,13 @@
 #' @importFrom stats median quantile rnorm var
 #' @keywords seed health
 #' @examples
-#' multipar() # to be added
+#' multipar() # more examples to be added
 #' @export
 #'
 
 
-# to do - GENERAL TESTING
-# to do - check whether parameter list is correct
+# to do - GT
 
-# Columns of output matrix
 # Columns of output matrix
 # col 1 - fHP healthy plant number
 # col 2 - fDP diseased plant number (after roguing)
@@ -35,8 +33,6 @@
 # col 12 - fYL end of season yield loss
 
 # mean (mean), median (median),  variance (var), quantile 0.05 (0.05), quantile 0.95 (0.95)
-
-# set.seed(1234)
 
 multipar <- function(pHSinit=c(0.2,0.5,0.8), Kx = 100, betax=c(0.02,0.04), wxtnormm=c(0.3,0.7),
                      wxtnormsd=c(0.3, 0.1), hx=1, mxtnormm=1, mxtnormsd=0.1, axtnormm=c(1,0.5),
