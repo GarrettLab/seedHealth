@@ -1,6 +1,16 @@
 # seedHealth
 seedHealth R package
 
+The following commands can be used to install and load the seedHealth package in R
+
+install.packages("devtools")
+library(devtools)
+devtools::install_github("GarrettLab/seedHealth")
+library(seedHealth)
+
+
+# Background
+
 Achieving seed health is a challenge for many seed systems, especially where quality-declared seed is too expensive or unavailable.
 
 The seedHealth R package is designed to inform common management decisions.
