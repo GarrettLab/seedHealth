@@ -1,7 +1,7 @@
 # seedHealth
 seedHealth R package
 
-## The following commands can be used to install and load the seedHealth package in R
+### The following commands can be used to install and load the seedHealth package in R
 
 install.packages("devtools")
 
@@ -26,7 +26,7 @@ It can also be used in multi-stakeholder participatory evaluations of strategies
 
 The open platform used for development of seedHealth will make it flexible for changes by the seed health community of practice.
 
-References
+### References
 
 Thomas-Sharma, S., et al. 2017. A risk assessment framework for seed degeneration: Informing an integrated seed health strategy for vegetatively-propagated crops. Phytopathology 107:1123-1135.
 
