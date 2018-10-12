@@ -1,7 +1,7 @@
 # seedHealth
 seedHealth R package
 
-# The following commands can be used to install and load the seedHealth package in R
+## The following commands can be used to install and load the seedHealth package in R
 
 install.packages("devtools")
 
