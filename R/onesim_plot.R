@@ -48,7 +48,7 @@ onesim_plot <- function(pHSinit=0.8, Kx = 100, betax=0.02, wxtnormm=0.8, wxtnorm
   #----------
   data <- as.data.frame(cbind(Yield_Loss,Season))
   data=data %>%
-    mutate(SimulateCol = rep(1:(nrow(data)/10), each=10))
+    mutate(SimulateCol = rep(1:(nrow(data)/nseasons), each=nseasons))
 
   ggplot(data, aes(Season, Yield_Loss)) +
     geom_point(alpha=0.1, color="dodgerblue") +
